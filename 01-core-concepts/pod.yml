@@ -1,13 +1,29 @@
-The important relationship we are demonstrating is:
-Pod
-└── Container
-    └── nginx
-______________________________________________________________    
+# Demonstrates the basic structure of a Kubernetes Pod.
+#
+# FLOW
+# ----
+# 1. kubectl sends this manifest to the Kubernetes API Server.
+# 2. The API Server validates the resource.
+# 3. The Pod is stored in the cluster state.
+# 4. The Scheduler selects a suitable node.
+# 5. The Kubelet on that node creates the container.
+# 6. The container runtime pulls nginx:1.27 if required.
+# 7. The container starts and Kubernetes reports its status.
+#
+# IMPORTANT
+# ---------
+# A Pod is the smallest deployable unit in Kubernetes.
+# A Pod is NOT the same thing as a container.
+#
+# This example intentionally uses a single container.
+#______________________________________________________________    
 apiVersion: v1
 kind: Pod
 metadata:
   name: demo-pod
   namespace: production-demo
+# Labels identify the Pod and are later used by
+# other Kubernetes resources such as Services.
   labels:
     app: demo
 spec:
