@@ -1,1 +1,124 @@
+# Kubernetes Deployment Example
+#
+# PURPOSE
+# -------
+# Demonstrates how a Deployment manages application Pods.
+#
+# WHY NOT CREATE PODS DIRECTLY?
+# -----------------------------
+# A standalone Pod represents a single running instance.
+# If that Pod is deleted, there is no Deployment/ReplicaSet
+# responsible for recreating it.
+#
+# A Deployment provides:
+#   - Desired replica count
+#   - Self-healing through ReplicaSet
+#   - Rolling updates
+#   - Rollbacks
+#   - Declarative application management
+#
+#
+# CONTROL FLOW
+# ------------
+#
+#                Deployment
+#                     |
+#                     v
+#                ReplicaSet
+#                     |
+#             +-------+-------+
+#             |               |
+#             v               v
+#           Pod 1           Pod 2
+#             |               |
+#             v               v
+#          Container       Container
+#
+#
+# When the desired replica count is 2:
+#
+# Deployment
+#    |
+#    | creates/manages
+#    v
+# ReplicaSet
+#    |
+#    | maintains
+#    +-------> Pod 1
+#    |
+#    +-------> Pod 2
+#
+#
+# IMPORTANT
+# ---------
+# The Deployment does NOT directly create/manage individual Pods.
+# The Deployment manages a ReplicaSet, and the ReplicaSet maintains
+# the required number of Pods.
+#
+# If one Pod disappears:
+#
+#     Pod 1  ---> deleted
+#
+#     ReplicaSet detects:
+#     Desired = 2
+#     Current = 1
+#
+#     ReplicaSet creates a replacement Pod.
+#
+#
+# DESIRED STATE VS ACTUAL STATE
+# -----------------------------
+#
+# This manifest declares:
+#
+#     Desired replicas = 2
+#
+# Kubernetes continuously works to make the actual cluster state
+# match this desired state.
 
+
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: demo-deployment
+  namespace: production-demo
+
+spec:
+  # Number of desired Pod replicas.
+  replicas: 2
+  # Deployment uses this selector to identify the Pods
+  # that belong to this Deployment.
+  selector:
+    matchLabels:
+      app: demo
+      
+  template:
+    # Labels applied to every Pod created by this Deployment.
+    metadata:
+      labels:
+        app: demo
+
+    spec:
+      containers:
+        - name: demo-container
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+#_____________________________________________________
+#The selector and template needs to match always.
+# selector: "Find/manage Pods with app=demo."
+#Template: "Any Pod I create will have app=demo"
+
+Deployment
+     |
+     | selector: app=demo
+     |
+     ▼
+ ReplicaSet
+     |
+     | creates Pods
+     |
+     ├── Pod (app=demo)
+     └── Pod (app=demo)
