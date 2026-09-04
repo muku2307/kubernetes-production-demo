@@ -1,1 +1,7 @@
+# A namespace provides a logical boundary for organizing Kubernetes resources
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-demo
 
+  
