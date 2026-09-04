@@ -1,0 +1,86 @@
+# Kubernetes ClusterIP Service Example
+#
+# PURPOSE
+# -------
+# Demonstrates how a Kubernetes Service provides a stable
+# network endpoint for a set of Pods.
+#
+#
+# WHY DO WE NEED A SERVICE?
+# Pods are temporary.
+#
+# A Pod can be deleted and recreated, and the replacement Pod
+# may receive a different IP address.
+#
+# Therefore, applications should generally NOT depend directly
+# on individual Pod IP addresses.
+#
+# WITHOUT A SERVICE
+# Client
+#   |
+#   +----> Pod 10.0.1.10
+#   |
+#   +----> Pod 10.0.1.11
+#
+# If a Pod is recreated:
+#
+#   Pod 10.0.1.10  ---> deleted
+#   New Pod        ---> 10.0.1.15
+#
+# The client would need to know about the new IP.
+#
+# WITH A SERVICE
+# --------------
+#
+#                  Service
+#               demo-service
+#                    |
+#             +------+------+
+#             |             |
+#             v             v
+#           Pod 1         Pod 2
+#        10.0.1.10      10.0.1.11
+#
+# The Service provides a stable virtual endpoint and
+# routes traffic to matching Pods.
+#
+#
+# HOW DOES THE SERVICE FIND THE PODS?
+# -----------------------------------
+#
+# The Service uses its selector:
+#
+#     app: demo
+#
+# Kubernetes identifies Pods with matching labels and
+# sends traffic to those Pods.
+
+# IMPORTANT
+# ---------
+# A Service is NOT the same thing as an Ingress.
+#
+# ClusterIP provides internal cluster connectivity.
+# Ingress provides HTTP/HTTPS routing into the cluster,
+# usually through an Ingress Controller.
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: demo-service
+  namespace: production-demo
+
+spec:
+  # ClusterIP is the default Service type.
+  # It provides an internal virtual IP accessible
+  # from within the Kubernetes cluster.
+  type: ClusterIP
+  # The Service sends traffic to Pods matching this label.
+  selector:
+    app: demo
+  ports:
+    - name: http
+      # Port exposed by the Service.
+      port: 80
+      # Port on the selected Pod/container.
+      targetPort: 80
