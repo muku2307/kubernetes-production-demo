@@ -1,1 +1,18 @@
-
+The important relationship we are demonstrating is:
+Pod
+└── Container
+    └── nginx
+______________________________________________________________    
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-pod
+  namespace: production-demo
+  labels:
+    app: demo
+spec:
+  containers:
+    - name: demo-container
+      image: nginx:1.27
+      ports:
+        - containerPort: 80
